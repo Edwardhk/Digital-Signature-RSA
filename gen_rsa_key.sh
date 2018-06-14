@@ -1,0 +1,1 @@
+gcc main.c -lcrypto && ./a.out
