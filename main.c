@@ -1,7 +1,49 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
- 
-int main(){
+#include <stdbool.h>
+#include <string.h>
+
+bool
+rsa_sign(RSA* rsa, const unsigned char* Msg, 
+	      size_t MsgLen, unsigned char** EncMsg, 
+	      size_t* MsgLenEnc){
+	EVP_MD_CTX* m_RSASignCtx = EVP_MD_CTX_create();
+	EVP_PKEY* priKey  = EVP_PKEY_new();
+	EVP_PKEY_assign_RSA(priKey, rsa);
+
+	if (EVP_DigestSignInit(m_RSASignCtx,NULL, EVP_sha256(), NULL,priKey)<=0)
+  		return false;
+	if (EVP_DigestSignUpdate(m_RSASignCtx, Msg, MsgLen) <= 0)
+		return false;
+	if (EVP_DigestSignFinal(m_RSASignCtx, NULL, MsgLenEnc) <=0)
+		return false;
+
+	*EncMsg = (unsigned char*)malloc(*MsgLenEnc);
+	if (EVP_DigestSignFinal(m_RSASignCtx, *EncMsg, MsgLenEnc) <= 0)
+		return false;
+	EVP_MD_CTX_cleanup(m_RSASignCtx);
+
+	return true;
+}
+
+void
+base_64_encode(const unsigned char* b64_input, size_t length, 
+                   char** b64_output){ 
+	BIO *bio, *b64;
+	BUF_MEM *bufferPtr;
+	b64 = BIO_new(BIO_f_base64());
+	bio = BIO_new(BIO_s_mem());
+	bio = BIO_push(b64, bio);
+	BIO_write(bio, b64_input, length);
+	BIO_flush(bio);
+	BIO_get_mem_ptr(bio, &bufferPtr);
+	BIO_set_close(bio, BIO_NOCLOSE);
+	BIO_free_all(bio);
+	*b64_output=(*bufferPtr).data;
+}
+
+int
+main(){
 	const int kBits = 2048;
 	unsigned long e = RSA_F4;
 	int keylen;
@@ -13,14 +55,14 @@ int main(){
 		printf("[Debug] BIGNUM allocated!\n");
 	else
 		printf("[Debug] BIGNUM NOT allocated!\n");
- 
+ 	
 	// RSA PART
 	RSA *rsa = RSA_new();
 	if(RSA_generate_key_ex(rsa, 2048, bignum, NULL))
 		printf("[Debug] RSA allocated!\n");
 	else
 		printf("[Debug] RSA NOT allocated!\n");
- 
+
 	// BIO PART
 	BIO *bio = BIO_new(BIO_s_mem());
 	PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
@@ -29,8 +71,25 @@ int main(){
 	pem_key = calloc(keylen+1, 1); /* Null-terminate */
 	BIO_read(bio, pem_key, keylen);
  
-	// OUTPUT
-	printf("%s", pem_key);
+	// Print the private key generated
+	printf("[Debug] Private key generated as: \n%s\n", pem_key);
+ 	
+	// Sign the message with RSA generated and store in b64_input
+ 	unsigned char* plain_text_input = "Hello I am Edward";
+ 	unsigned char* b64_input;
+ 	size_t b64_input_len;
+	rsa_sign(rsa, plain_text_input, strlen(plain_text_input), &b64_input, &b64_input_len);
+	printf("[Debug] Message before sign: \n%s\n\n", plain_text_input);
+	printf("[Debug] Message after sign: \n%s\n\n", b64_input);
+
+	// Encode the b64_input produced by rsa_sign
+	char* b64_output;
+	base_64_encode(b64_input, strlen(b64_input), &b64_output);
+	printf("[Debug] Message after sign (base_64 encoded): \n%s\n\n", b64_output);
+
+
+
+
  
 	// FREE THE MEMORY
 	BIO_free_all(bio);

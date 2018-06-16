@@ -6,10 +6,11 @@ sudo apt-get install automake autoconf git libtool perl
 git clone https://github.com/libressl-portable/portable.git libressl
 
 # Prepare the source tree
-cd libressl && ./autogen.sh
+cd libressl && sh autogen.sh
 
 # Configure the source tree and compile the libressl
-sudo ./configure --prefix="${HOME}/opt/libressl" && make -j
+./configure --prefix="${HOME}/opt/libressl"
+make -j
 
 # Install the libressl under ${HOME}/opt/libressl
 sudo make install
