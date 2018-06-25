@@ -4,22 +4,23 @@
 #include <string.h>
 
 bool
-rsa_sign(RSA* rsa, const unsigned char* Msg, 
-	      size_t MsgLen, unsigned char** EncMsg, 
-	      size_t* MsgLenEnc){
+rsa_sign(RSA* rsa, const unsigned char* before_sign_msg, unsigned char** after_sign_msg, 
+	      size_t* after_sign_msg_len){
+	size_t before_sign_msg_len = strlen(before_sign_msg);
 	EVP_MD_CTX* m_RSASignCtx = EVP_MD_CTX_create();
 	EVP_PKEY* priKey  = EVP_PKEY_new();
 	EVP_PKEY_assign_RSA(priKey, rsa);
 
-	if (EVP_DigestSignInit(m_RSASignCtx,NULL, EVP_sha256(), NULL,priKey) <= 0)
+	if (EVP_DigestSignInit(m_RSASignCtx, NULL, EVP_sha256(), NULL, priKey) <= 0)
   		return false;
-	if (EVP_DigestSignUpdate(m_RSASignCtx, Msg, MsgLen) <= 0)
+	if (EVP_DigestSignUpdate(m_RSASignCtx, before_sign_msg, before_sign_msg_len) <= 0)
 		return false;
-	if (EVP_DigestSignFinal(m_RSASignCtx, NULL, MsgLenEnc) <= 0)
+	if (EVP_DigestSignFinal(m_RSASignCtx, NULL, after_sign_msg_len) <= 0)
 		return false;
 
-	*EncMsg = (unsigned char*)malloc(*MsgLenEnc);
-	if (EVP_DigestSignFinal(m_RSASignCtx, *EncMsg, MsgLenEnc) <= 0)
+	*after_sign_msg = (unsigned char*)malloc(*after_sign_msg_len);
+
+	if (EVP_DigestSignFinal(m_RSASignCtx, *after_sign_msg, after_sign_msg_len) <= 0)
 		return false;
 	EVP_MD_CTX_cleanup(m_RSASignCtx);
 
@@ -90,15 +91,16 @@ main(){
 	//printf("[Debug] FAKE Private key generated as: \n%s\n", pem_key_fake);
  	
  	// Create a plain text input before the 
- 	unsigned char* plain_text_input = "Hello I am Edward";
- 	unsigned char* b64_input, b64_input_fake;
- 	size_t b64_input_len, b64_input_fake_len;
-	char* b64_output, b64_output_fake;
+ 	unsigned char* plain_text_input = "GK_GRANTED";
+ 	unsigned char* b64_input = NULL;
+	unsigned char* b64_input_fake = NULL;
+ 	size_t b64_input_len = 0, b64_input_fake_len = 0;
+	char* b64_output = NULL;
+	char* b64_output_fake = NULL;
 
 	printf("[Debug] Message before sign: \n%s\n\n", plain_text_input);
-
-	rsa_sign(rsa, plain_text_input, strlen(plain_text_input), &b64_input, &b64_input_len); // Sign the message with RSA generated and store in b64_input
-	rsa_sign(rsa_fake, plain_text_input, strlen(plain_text_input), &b64_input_fake, &b64_input_fake_len);
+	rsa_sign(rsa, plain_text_input, &b64_input, &b64_input_len); // Sign the message with RSA generated and store in b64_input
+	rsa_sign(rsa_fake, plain_text_input, &b64_input_fake, &b64_input_fake_len);
 	//printf("[Debug] Message after sign: \n%s\n\n", b64_input);
 	//printf("[Debug] Message after FAKE KEY sign: \n%s\n\n", b64_input_fake);
 
