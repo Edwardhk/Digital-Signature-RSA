@@ -73,45 +73,38 @@ main(){
 	// RSA PART
 	RSA *rsa = RSA_new();
 	RSA* rsa_fake = RSA_new();
-	//RSA* rsa_fake = RSA_new()
 	if(RSA_generate_key_ex(rsa, 2048, bignum, NULL))
 		printf("[Debug] RSA allocated!\n");
 	else
 		printf("[Debug] RSA NOT allocated!\n");
 
-	RSA_generate_key_ex(rsa_fake, 2048, bignum, NULL);
+	if(RSA_generate_key_ex(rsa_fake, 2048, bignum, NULL))
+		printf("[Debug] FAKE RSA allocated!\n");
+	else
+		printf("[Debug] FAKE RSA NOT allocated!\n");
 
 	// Generate char* pem_key using RSA* rsa
 	pem_key = write_rsa_to_char(rsa);
 	pem_key_fake = write_rsa_to_char(rsa_fake);
- 
-	// Print the private key generated
 	//printf("[Debug] Private key generated as: \n%s\n", pem_key);
+	//printf("[Debug] FAKE Private key generated as: \n%s\n", pem_key_fake);
  	
  	// Create a plain text input before the 
  	unsigned char* plain_text_input = "Hello I am Edward";
+ 	unsigned char* b64_input, b64_input_fake;
+ 	size_t b64_input_len, b64_input_fake_len;
+	char* b64_output, b64_output_fake;
+
 	printf("[Debug] Message before sign: \n%s\n\n", plain_text_input);
 
-	// Sign the message with RSA generated and store in b64_input
- 	unsigned char* b64_input;
- 	size_t b64_input_len;
-	rsa_sign(rsa, plain_text_input, strlen(plain_text_input), &b64_input, &b64_input_len);
-	//printf("[Debug] Message after sign: \n%s\n\n", b64_input);
-
-	// Encode the b64_input produced by rsa_sign
-	char* b64_output;
-	base_64_encode(b64_input, strlen(b64_input), &b64_output);
-	printf("[Debug] Message after sign (base_64 encoded): \n%s\n\n", b64_output);
-
-	// FAKE
- 	unsigned char* b64_input_fake;
- 	size_t b64_input_fake_len;
+	rsa_sign(rsa, plain_text_input, strlen(plain_text_input), &b64_input, &b64_input_len); // Sign the message with RSA generated and store in b64_input
 	rsa_sign(rsa_fake, plain_text_input, strlen(plain_text_input), &b64_input_fake, &b64_input_fake_len);
+	//printf("[Debug] Message after sign: \n%s\n\n", b64_input);
 	//printf("[Debug] Message after FAKE KEY sign: \n%s\n\n", b64_input_fake);
 
-	// FAKE
-	char* b64_output_fake;
+	base_64_encode(b64_input, strlen(b64_input), &b64_output);	// Encode the b64_input produced by rsa_sign
 	base_64_encode(b64_input_fake, strlen(b64_input_fake), &b64_output_fake);
+	printf("[Debug] Message after sign (base_64 encoded): \n%s\n\n", b64_output);
 	printf("[Debug] FAKE Message after FAKE KEY sign (base_64 encoded): \n%s\n\n", b64_output_fake);
  
 	// FREE THE MEMORY
