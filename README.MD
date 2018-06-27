@@ -15,6 +15,8 @@ Then compile the `main.c` by
 
 `$ ./gen_rsa_key.sh`
 
+</br>
+
 ## Functions list
 
 | Return    | Function_name             | Usage |
@@ -24,5 +26,16 @@ Then compile the `main.c` by
 | char*     | `get_private_char()`      | Takes RSA*, returns private key char* |
 | char*     | `get_public_char()`       | Takes RSA*, returns public key char* |
 
+</br>
 
+## Main flow
+
+| Device                  | Action|
+| ---------               | -----|
+| `Client`                | Generate private & public key|
+| `Host`                  | Receive public key|
+| `Host`                  | Sign the message with public key|
+| `Host`                  | Encode signed message in base64 format|
+| `Client`                | Decode the base64 format message|
+| `Client`                | Decrypt the message with private key|
 
