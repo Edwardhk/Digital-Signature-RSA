@@ -66,22 +66,16 @@ main(){
 	
 	// BIGNUM PART
 	BIGNUM* bignum = BN_new();
-	if(BN_set_word(bignum, e))
-		printf("[Debug] BIGNUM allocated!\n");
-	else
+	if(!BN_set_word(bignum, e))
 		printf("[Debug] BIGNUM NOT allocated!\n");
  	
 	// RSA PART
 	RSA *rsa = RSA_new();
 	RSA* rsa_fake = RSA_new();
-	if(RSA_generate_key_ex(rsa, 2048, bignum, NULL))
-		printf("[Debug] RSA allocated!\n");
-	else
+	if(!RSA_generate_key_ex(rsa, 2048, bignum, NULL))
 		printf("[Debug] RSA NOT allocated!\n");
 
-	if(RSA_generate_key_ex(rsa_fake, 2048, bignum, NULL))
-		printf("[Debug] FAKE RSA allocated!\n");
-	else
+	if(!RSA_generate_key_ex(rsa_fake, 2048, bignum, NULL))
 		printf("[Debug] FAKE RSA NOT allocated!\n");
 
 	// Generate char* pem_key using RSA* rsa
