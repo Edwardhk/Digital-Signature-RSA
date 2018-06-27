@@ -21,7 +21,8 @@ Then compile the `main.c` by
 | --------- |:-------------             | -----|
 | bool      | `rsa_sign()`              | Takes RSA* and original msg, returns signed msg and its length |
 | void      | `base_64_encode()`        | Takes msg and length, returns base64 encoded msg |
-| char*     | `write_rsa_to_char()`     | Takes RSA* and write it to printable char* |
+| char*     | `get_private_char()`      | Takes RSA*, returns private key char* |
+| char*     | `get_public_char()`       | Takes RSA*, returns public key char* |
 
 
 

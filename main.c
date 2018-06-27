@@ -48,19 +48,31 @@ get_private_char(RSA* rsa){
 	char* pem_key;
 	int keylen;
 
-	BIO *bio = BIO_new(BIO_s_mem());
-	PEM_write_bio_RSAPrivateKey(bio, rsa, NULL, NULL, 0, NULL, NULL);
-	keylen = BIO_pending(bio);
+	BIO *private_bp = BIO_new(BIO_s_mem());
+	PEM_write_bio_RSAPrivateKey(private_bp, rsa, NULL, NULL, 0, NULL, NULL);
+	keylen = BIO_pending(private_bp);
 	pem_key = calloc(keylen+1, 1); /* Null-terminate */
-	BIO_read(bio, pem_key, keylen);
+	BIO_read(private_bp, pem_key, keylen);
 
 	return pem_key;
 }
 
+char*
+get_public_char(RSA *rsa){
+	char* pub_key;
+	int keylen;
+
+	BIO *public_bp = BIO_new(BIO_s_mem());
+	PEM_write_bio_RSAPublicKey(public_bp, rsa);
+	keylen = BIO_pending(public_bp);
+	pub_key = calloc(keylen+1, 1);
+	BIO_read(public_bp, pub_key, keylen);
+
+	return pub_key;
+}
 
 int
 main(){
-	const int kBits = 2048;
 	unsigned long e = RSA_F4;
 	char *pem_key, *pem_key_fake;
 	
