@@ -32,10 +32,10 @@ Then compile the `main.c` by
 
 | Device                  | Action|
 | ---------               | -----|
-| `Client`                | Generate private & public key|
-| `Host`                  | Receive public key|
-| `Host`                  | Sign the message with public key|
-| `Host`                  | Encode signed message in base64 format|
-| `Client`                | Decode the base64 format message|
-| `Client`                | Decrypt the message with private key|
+| Client                  | Generate `private_key` & `public_key`|
+| Host                    | Receive `public_key`|
+| Host                    | Sign the message with `public_key`|
+| Host                    | Encode signed message in base64 format|
+| Client                  | Decode the base64 format message|
+| Client                  | Decrypt the message with `private_key`|
 
