@@ -44,7 +44,7 @@ base_64_encode(const unsigned char* b64_input, size_t length,
 }
 
 char*
-write_rsa_to_char(RSA* rsa){
+get_private_char(RSA* rsa){
 	char* pem_key;
 	int keylen;
 
@@ -79,8 +79,8 @@ main(){
 		printf("[Debug] FAKE RSA NOT allocated!\n");
 
 	// Generate char* pem_key using RSA* rsa
-	pem_key = write_rsa_to_char(rsa);
-	pem_key_fake = write_rsa_to_char(rsa_fake);
+	pem_key = get_private_char(rsa);
+	pem_key_fake = get_private_char(rsa_fake);
 	//printf("[Debug] Private key generated as: \n%s\n", pem_key);
 	//printf("[Debug] FAKE Private key generated as: \n%s\n", pem_key_fake);
  	

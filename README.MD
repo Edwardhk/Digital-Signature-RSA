@@ -1,7 +1,11 @@
-# RSA digital signature using libressl
+# RSA Digital Signature with libressl
 
 
 ## Installation
+
+Clone the repository
+
+`$ git clone https://github.com/Edwardhk/Digital-Signature-RSA.git`
 
 Install the libressl using the `setup.sh`
 
